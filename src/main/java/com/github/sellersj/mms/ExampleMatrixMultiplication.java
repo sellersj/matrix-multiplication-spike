@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.cpu.nativecpu.NDArray;
-import org.nd4j.linalg.factory.Nd4j;
 
 public class ExampleMatrixMultiplication {
 
@@ -68,15 +67,17 @@ public class ExampleMatrixMultiplication {
     }
 
     private INDArray calculate(INDArray input) {
-        // TODO actually do the calculation here
-        INDArray a1 = calculateNetworkLayerOneTwoThree(input, 1);
-        // INDArray a2 = calculateNetworkLayerOneTwoThree(a1, 1);
-        // INDArray a3 = calculateNetworkLayerOneTwoThree(a2, 1);
 
-        // TODO return a mock for now
-        INDArray mock = Nd4j.rand(1040, 1);
+        // calculate the first 3 layers
+        INDArray ehN = input;
+        for (int layer = 1; layer <= 3; layer++) {
+            ehN = calculateNetworkLayerOneTwoThree(ehN, layer);
+        }
 
-        return mock;
+        // calculate the 4th layer slightly differently
+        INDArray eh4 = calculateNetworkLayerFour(ehN);
+
+        return eh4;
     }
 
     /**
@@ -94,7 +95,53 @@ public class ExampleMatrixMultiplication {
         // a1...a3
         INDArray ehN = setNegitiveValuesToZero(zedN);
 
+        // TODO change this to a debug logging statement
+        System.out.println("For layer: " + layer + " the size is [" + ehN.rows() + ", " + ehN.columns() + "]");
+
         return ehN;
+    }
+
+    private INDArray calculateNetworkLayerFour(INDArray input) {
+        int layer = 4;
+        INDArray kayN = weightHolder.getLayer(layer).mmul(input);
+        INDArray zedN = kayN.add(biasHolder.getLayer(layer));
+
+        INDArray ehN = scaleElement(zedN);
+
+        return ehN;
+    }
+
+    /**
+     * Scale the values using: x = ( x - x_min ) / (x_max - x_min)
+     * 
+     * @param array
+     * @return
+     */
+    private INDArray scaleElement(INDArray array) {
+        double max = Double.MIN_VALUE;
+        double min = Double.MAX_VALUE;
+
+        // figure out the min and the max
+        for (int rowIndex = 0; rowIndex < array.rows(); rowIndex++) {
+            for (int colIndex = 0; colIndex < array.columns(); colIndex++) {
+                double value = array.getDouble(rowIndex, colIndex);
+                max = Math.max(max, value);
+                min = Math.min(min, value);
+            }
+        }
+        // TOOD change to debug
+        System.out.println(String.format("Min / Max are: %s, %s", min, max));
+
+        // now figure out the new value
+        for (int rowIndex = 0; rowIndex < array.rows(); rowIndex++) {
+            for (int colIndex = 0; colIndex < array.columns(); colIndex++) {
+                double value = array.getDouble(rowIndex, colIndex);
+                double scaled = (value - min) / (max - min);
+                array.put(rowIndex, colIndex, scaled);
+            }
+        }
+
+        return array;
     }
 
     /**
