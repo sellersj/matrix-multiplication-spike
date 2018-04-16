@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
 public class ExampleMatrixMultiplicationTest {
 
@@ -53,12 +55,39 @@ public class ExampleMatrixMultiplicationTest {
         List<Double> corrections = multiplier.getCorrections(wrongSizedList);
         assertNotNull("the list shouldn't be null", corrections);
 
-        assertEquals("result should have right size", 1040, corrections.size());
+        assertEquals("result should have right size", ExampleMatrixMultiplication.NUMBER_OF_PROGRAMS,
+            corrections.size());
 
         // make sure all in range
         for (Double actual : corrections) {
             assertTrue("the value should greater than or equal to min but was " + actual, actual >= 0);
             assertTrue("the value should less than or equal to max but was " + actual, actual <= 1);
+        }
+    }
+
+    @Test
+    public void setNegitiveValuesToZero() {
+        // make a 2d array, force half the values to negitive
+        int size = 100;
+        INDArray array = Nd4j.rand(size, size);
+
+        // create negative numbers in half the rows
+        for (int rowIndex = 0; rowIndex < array.rows() / 2; rowIndex++) {
+            for (int colIndex = 0; colIndex < array.columns(); colIndex++) {
+                double value = array.getDouble(rowIndex, colIndex);
+                array.put(rowIndex, colIndex, value * -1);
+            }
+        }
+
+        // call the actual function
+        INDArray actual = multiplier.setNegitiveValuesToZero(array);
+
+        // check that it went okay
+        for (int rowIndex = 0; rowIndex < actual.rows() / 2; rowIndex++) {
+            for (int colIndex = 0; colIndex < actual.columns(); colIndex++) {
+                double value = actual.getDouble(rowIndex, colIndex);
+                assertTrue("should only be a positve number but was " + value, value >= 0);
+            }
         }
     }
 
