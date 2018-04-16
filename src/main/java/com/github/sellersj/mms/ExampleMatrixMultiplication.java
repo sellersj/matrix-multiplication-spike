@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.cpu.nativecpu.NDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
 public class ExampleMatrixMultiplication {
@@ -45,7 +46,25 @@ public class ExampleMatrixMultiplication {
             return getNonBreakingResult(normalizedInput.size());
         }
 
-        return null;
+        INDArray input = convertTo(normalizedInput);
+        INDArray calculated = calculate(input);
+        List<Long> result = convertTo(calculated);
+
+        return result;
+    }
+
+    private INDArray convertTo(List<BigDecimal> normalizedInput) {
+        INDArray array = new NDArray();
+        return array;
+    }
+
+    private List<Long> convertTo(INDArray calculated) {
+        List<Long> list = new ArrayList<>();
+        return list;
+    }
+
+    private INDArray calculate(INDArray input) {
+        return new NDArray();
     }
 
     /**

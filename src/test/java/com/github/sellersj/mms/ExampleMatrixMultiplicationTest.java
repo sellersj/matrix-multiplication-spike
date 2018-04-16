@@ -2,6 +2,7 @@ package com.github.sellersj.mms;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -45,17 +46,19 @@ public class ExampleMatrixMultiplicationTest {
     @Test
     public void testGetCorrections_CorrectNumberOfStories() {
         // make an input of the wrong size
-        int wrongSize = ExampleMatrixMultiplication.NUMBER_OF_USER_STORIES;
-        List<BigDecimal> wrongSizedList = createRandomNormalizedInput(wrongSize);
+        int size = ExampleMatrixMultiplication.NUMBER_OF_USER_STORIES;
+        List<BigDecimal> wrongSizedList = createRandomNormalizedInput(size);
 
         // check that it's filled out and that all the values are zero
         List<Long> corrections = multiplier.getCorrections(wrongSizedList);
         assertNotNull("the list shouldn't be null", corrections);
 
-        // make sure all the values are zero so it's not actually broken
-        Long zero = Long.valueOf(0);
+        assertEquals("result should have right size", size, corrections.size());
+
+        // make sure all in range
         for (Long actual : corrections) {
-            assertEquals("the value shouldn't be ", zero, actual);
+            assertTrue("the value should greater than or equal to min but was " + actual, actual >= 0);
+            assertTrue("the value should less than or equal to max but was " + actual, actual <= 1);
         }
     }
 
