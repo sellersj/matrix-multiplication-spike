@@ -1,7 +1,5 @@
 package com.github.sellersj.mms;
 
-import static org.junit.Assert.assertEquals;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,35 +10,13 @@ import org.nd4j.linalg.factory.Nd4j;
 
 public class ExampleMatrixMultiplication {
 
-    public static final int NUMBER_OF_FEATURES = 3000;
+    public static final int NUMBER_OF_FEATURES = 300;
 
-    public static final int NUMBER_OF_USER_STORIES = 86;
+    public static final int NUMBER_OF_USER_STORIES = 110;
 
     public static final int NUMBER_OF_USERS = 1;
 
-    public static void main(String[] args) throws Exception {
-        //
-        List<BigDecimal> normalizedList = new ArrayList<>();
-
-        INDArray userstory = Nd4j.rand(NUMBER_OF_USER_STORIES, NUMBER_OF_USERS);
-
-        int nRows = 1;
-        int nColumns = 82;
-        INDArray ones = Nd4j.ones(nRows, nColumns);
-        INDArray rand = Nd4j.rand(nRows, nColumns);
-
-        INDArray result = rand.mul(ones);
-
-        result.add(addArray());
-
-        System.out.println(result);
-    }
-
-    private static INDArray addArray() {
-        return Nd4j.rand(1, 82);
-    }
-
-    public List<Long> getCorrections(List<BigDecimal> normalizedInput) {
+    public List<Double> getCorrections(List<BigDecimal> normalizedInput) {
         if (NUMBER_OF_USER_STORIES != normalizedInput.size()) {
             // TODO log an error
             return getNonBreakingResult(normalizedInput.size());
@@ -48,23 +24,49 @@ public class ExampleMatrixMultiplication {
 
         INDArray input = convertTo(normalizedInput);
         INDArray calculated = calculate(input);
-        List<Long> result = convertTo(calculated);
+        List<Double> result = convertTo(calculated);
 
         return result;
     }
 
     private INDArray convertTo(List<BigDecimal> normalizedInput) {
-        INDArray array = new NDArray();
+        int size = NUMBER_OF_USER_STORIES;
+        INDArray array = new NDArray(size, 1);
+        int i = 0;
+        for (BigDecimal bigDecimal : normalizedInput) {
+            array.putScalar(i, bigDecimal.doubleValue());
+        }
+
         return array;
     }
 
-    private List<Long> convertTo(INDArray calculated) {
-        List<Long> list = new ArrayList<>();
+    /**
+     * This will convert from the internal matrix multiplication library to normal java classes.
+     * 
+     * @param calculated objects calculated
+     * @return
+     */
+    private List<Double> convertTo(INDArray calculated) {
+        List<Double> list = new ArrayList<>();
+
+        for (int i = 0; i < calculated.rows(); i++) {
+            // get the double out of the first column
+            double value = calculated.getDouble(i, 0);
+
+            // TODO check why they are expecting a long in the original spec
+            list.add(Double.valueOf(value));
+        }
+
         return list;
     }
 
     private INDArray calculate(INDArray input) {
-        return new NDArray();
+        // TODO actually do the calculation here
+
+        // TODO return a mock for now
+        INDArray mock = Nd4j.rand(1040, 1);
+
+        return mock;
     }
 
     /**
@@ -73,9 +75,9 @@ public class ExampleMatrixMultiplication {
      * @param size
      * @return
      */
-    private List<Long> getNonBreakingResult(int size) {
-        List<Long> norm = new ArrayList<>(size);
-        Long zero = Long.valueOf(0);
+    private List<Double> getNonBreakingResult(int size) {
+        List<Double> norm = new ArrayList<>(size);
+        Double zero = Double.valueOf(0);
         for (int i = 0; i < size; i++) {
             norm.add(zero);
         }

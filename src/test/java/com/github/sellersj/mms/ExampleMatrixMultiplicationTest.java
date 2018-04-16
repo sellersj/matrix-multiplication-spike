@@ -33,12 +33,12 @@ public class ExampleMatrixMultiplicationTest {
         List<BigDecimal> wrongSizedList = createRandomNormalizedInput(wrongSize);
 
         // check that it's filled out and that all the values are zero
-        List<Long> corrections = multiplier.getCorrections(wrongSizedList);
+        List<Double> corrections = multiplier.getCorrections(wrongSizedList);
         assertNotNull("the list shouldn't be null", corrections);
 
         // make sure all the values are zero so it's not actually broken
-        Long zero = Long.valueOf(0);
-        for (Long actual : corrections) {
+        Double zero = Double.valueOf("0.0");
+        for (Double actual : corrections) {
             assertEquals("the value shouldn't be ", zero, actual);
         }
     }
@@ -50,13 +50,13 @@ public class ExampleMatrixMultiplicationTest {
         List<BigDecimal> wrongSizedList = createRandomNormalizedInput(size);
 
         // check that it's filled out and that all the values are zero
-        List<Long> corrections = multiplier.getCorrections(wrongSizedList);
+        List<Double> corrections = multiplier.getCorrections(wrongSizedList);
         assertNotNull("the list shouldn't be null", corrections);
 
-        assertEquals("result should have right size", size, corrections.size());
+        assertEquals("result should have right size", 1040, corrections.size());
 
         // make sure all in range
-        for (Long actual : corrections) {
+        for (Double actual : corrections) {
             assertTrue("the value should greater than or equal to min but was " + actual, actual >= 0);
             assertTrue("the value should less than or equal to max but was " + actual, actual <= 1);
         }
